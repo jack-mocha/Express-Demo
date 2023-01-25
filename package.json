@@ -1,0 +1,23 @@
+{
+  "name": "express-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jack-mocha/Express-Demo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jack-mocha/Express-Demo/issues"
+  },
+  "homepage": "https://github.com/jack-mocha/Express-Demo#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
