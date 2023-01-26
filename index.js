@@ -1,5 +1,9 @@
+const Joi = require('joi'); //joi returns a class
 const express = require('express');
 const app = express();
+
+//middleware
+app.use(express.json()); //enable parsing of json object in the body of the request.
 
 const courses = [
     {id: 1, name: 'course1'},
@@ -12,7 +16,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/api/courses', (req, res) => {
-    res.send([1, 2, 3]);
+    res.send(courses);
 });
 
 //single parameter
@@ -29,6 +33,25 @@ app.get('/api/courses/:id', (req, res) => {
 app.get('/api/posts/:year/:month', (req, res) => {
     // res.send(req.params);
     res.send(req.query);
+});
+
+app.post('/api/courses', (req, res) => {
+    const schema = Joi.object({
+        name: Joi.string().min(3).required()
+    });
+    const result = schema.validate(req.body);
+    if(result.error) {
+        res.status(400).send(result.error);
+        return; //remember to return; otherwise, the code will keep going.
+    }
+
+    const course = {
+        id: courses.length + 1,
+        name: req.body.name
+    };
+
+    courses.push(course);
+    res.send(course);
 });
 
 const port = process.env.PORT || 3000;
