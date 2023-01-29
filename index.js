@@ -12,6 +12,9 @@ const app = express();
 console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
 console.log(`app: ${app.get('env')}`);
 
+app.set('view engine', 'pug'); //set the view engine of the application. No require is needed
+app.set('views', './views');
+
 //middleware
 app.use(express.json()); //enable parsing of json object in the body of the request.
 app.use(express.urlencoded({extended: true})); //needed when request body is x-www-form-urlencoded
@@ -40,7 +43,10 @@ const courses = [
 ];
 
 app.get('/', (req, res) => {
-    res.send('Hello World');
+    res.render('index', {
+        title: 'My Express App',
+        message: 'Hello'
+    });
 });
 
 app.get('/api/courses', (req, res) => {
