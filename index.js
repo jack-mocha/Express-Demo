@@ -1,3 +1,4 @@
+const config = require('config');
 const morgan = require('morgan');
 const helmet = require('helmet');
 const Joi = require('joi'); //joi returns a class
@@ -15,6 +16,10 @@ app.use(express.urlencoded({extended: true})); //needed when request body is x-w
 app.use(express.static('public'));
 
 app.use(helmet());
+console.log('Application Name:' + config.get('name'));
+console.log('Mail Server:' + config.get('mail.host'));
+console.log('Mail Password:' + config.get('mail.password'));
+
 if(app.get('env') === 'development') {
     app.use(morgan('tiny'));
     console.log('Morgan enabled...');
