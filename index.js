@@ -1,9 +1,13 @@
 const Joi = require('joi'); //joi returns a class
+const logger = require('./logger');
+const authenticator = require('./authenticator');
 const express = require('express');
 const app = express();
 
 //middleware
 app.use(express.json()); //enable parsing of json object in the body of the request.
+app.use(logger);
+app.use(authenticator);
 
 const courses = [
     {id: 1, name: 'course1'},
