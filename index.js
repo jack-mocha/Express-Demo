@@ -6,7 +6,8 @@ const authenticator = require('./authenticator');
 const express = require('express');
 const app = express();
 
-
+console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+console.log(`app: ${app.get('env')}`);
 
 //middleware
 app.use(express.json()); //enable parsing of json object in the body of the request.
@@ -14,7 +15,10 @@ app.use(express.urlencoded({extended: true})); //needed when request body is x-w
 app.use(express.static('public'));
 
 app.use(helmet());
-app.use(morgan('tiny'));
+if(app.get('env') === 'development') {
+    app.use(morgan('tiny'));
+    console.log('Morgan enabled...');
+}
 
 app.use(logger);
 app.use(authenticator);
