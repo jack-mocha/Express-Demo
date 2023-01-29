@@ -1,13 +1,21 @@
+const morgan = require('morgan');
+const helmet = require('helmet');
 const Joi = require('joi'); //joi returns a class
 const logger = require('./logger');
 const authenticator = require('./authenticator');
 const express = require('express');
 const app = express();
 
+
+
 //middleware
 app.use(express.json()); //enable parsing of json object in the body of the request.
 app.use(express.urlencoded({extended: true})); //needed when request body is x-www-form-urlencoded
 app.use(express.static('public'));
+
+app.use(helmet());
+app.use(morgan('tiny'));
+
 app.use(logger);
 app.use(authenticator);
 
