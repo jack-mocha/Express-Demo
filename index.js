@@ -3,9 +3,11 @@ const dbDebugger = require('debug')('app:db')
 const config = require('config');
 const morgan = require('morgan');
 const helmet = require('helmet');
-const Joi = require('joi'); //joi returns a class
-const logger = require('./logger');
-const authenticator = require('./authenticator');
+const logger = require('./middleware/logger');
+const authenticator = require('./middleware/authenticator');
+const courses = require('./routes/courses');
+const posts = require('./routes/posts');
+const home = require('./routes/home');
 const express = require('express');
 const app = express();
 
@@ -15,12 +17,16 @@ console.log(`app: ${app.get('env')}`);
 app.set('view engine', 'pug'); //set the view engine of the application. No require is needed
 app.set('views', './views');
 
-//middleware
+//built-in middleware
 app.use(express.json()); //enable parsing of json object in the body of the request.
 app.use(express.urlencoded({extended: true})); //needed when request body is x-www-form-urlencoded
 app.use(express.static('public'));
-
+//3rd party middleware
 app.use(helmet());
+//custom middleware
+app.use(logger);
+app.use(authenticator);
+
 console.log('Application Name:' + config.get('name'));
 console.log('Mail Server:' + config.get('mail.host'));
 console.log('Mail Password:' + config.get('mail.password'));
@@ -33,87 +39,10 @@ if(app.get('env') === 'development') {
 // DB work
 dbDebugger('Connected to the database...');
 
-app.use(logger);
-app.use(authenticator);
-
-const courses = [
-    {id: 1, name: 'course1'},
-    {id: 2, name: 'course2'},
-    {id: 3, name: 'course3'}
-];
-
-app.get('/', (req, res) => {
-    res.render('index', {
-        title: 'My Express App',
-        message: 'Hello'
-    });
-});
-
-app.get('/api/courses', (req, res) => {
-    res.send(courses);
-});
-
-//single parameter
-app.get('/api/courses/:id', (req, res) => {
-    const course = courses.find(c => c.id === parseInt(req.params.id));
-    if(!course)
-        return res.status(404).send('Not Found');
-
-    res.send(course);
-});
-
-//multiple parameters
-//access query
-app.get('/api/posts/:year/:month', (req, res) => {
-    // res.send(req.params);
-    res.send(req.query);
-});
-
-app.post('/api/courses', (req, res) => {
-    const { error } = validateCourse(req.body);
-    if(error) 
-        return res.status(400).send(error); //remember to return; otherwise, the code will keep going.
-
-    const course = {
-        id: courses.length + 1,
-        name: req.body.name
-    };
-
-    courses.push(course);
-    res.send(course);
-});
-
-app.put('/api/courses/:id', (req, res) => {
-    const course = courses.find(c => c.id === parseInt(req.params.id));
-    if(!course)
-        return res.status(404).send('Not Found');
-
-    const { error } = validateCourse(req.body);
-    if(error) 
-        return res.status(400).send(error);
-
-    course.name = req.body.name;
-    res.send(course);
-});
-
-app.delete('/api/courses/:id', (req, res) => {
-    const course = courses.find(c => c.id === parseInt(req.params.id));
-    if(!course)
-        return res.status(404).send('Not Found');
-
-    const index = courses.indexOf(course);
-    courses.splice(index, 1);
-
-    res.send(course);    
-});
-
-function validateCourse(course){
-    const schema = Joi.object({
-        name: Joi.string().min(3).required()
-    });
-
-    return schema.validate(course);
-}
+//routes
+app.use('/api/courses', courses);
+app.use('/api/posts', posts);
+app.use('/', home);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening on port ${port}...`));
